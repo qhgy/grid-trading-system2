@@ -94,6 +94,15 @@ class GridTradingApp {
             return;
         }
 
+        // 检查是否已存在相同品种的网格，提供策略选择
+        const existingGrids = this.grids.filter(g => g.symbol === symbol);
+        if (existingGrids.length > 0) {
+            const strategyName = this.getStrategyName(gridVersion, gridSize);
+            if (!confirm(`检测到${this.getSymbolName(symbol)}已有${existingGrids.length}个网格策略。\n\n即将创建新策略：${strategyName}\n\n是否继续创建多策略并行网格？`)) {
+                return;
+            }
+        }
+
         let grid;
 
         switch(gridVersion) {
@@ -115,12 +124,21 @@ class GridTradingApp {
         }
 
         if (grid) {
+            // 为网格添加策略标识
+            grid.strategyName = this.getStrategyName(gridVersion, gridSize);
+            grid.strategyType = this.getStrategyType(gridSize);
+
             this.grids.push(grid);
             this.currentGrid = grid;
             this.saveData();
             this.updateDisplay();
-            
-            alert(`${gridVersion}版网格创建成功！`);
+
+            const existingCount = this.grids.filter(g => g.symbol === grid.symbol).length;
+            const message = existingCount > 1 ?
+                `${grid.strategyName}创建成功！\n${this.getSymbolName(grid.symbol)}现在有${existingCount}个并行策略。` :
+                `${grid.strategyName}创建成功！`;
+
+            alert(message);
         }
     }
 
@@ -237,6 +255,29 @@ class GridTradingApp {
             '513500': '标普500ETF'
         };
         return names[symbol] || symbol;
+    }
+
+    // 获取策略名称
+    getStrategyName(version, gridSize) {
+        const versionName = {
+            '2.1': '留利润版',
+            '2.2': '逐格加码版',
+            '2.3': '一网打尽版',
+            '1.0': '基础版'
+        }[version] || version;
+
+        const strategyType = this.getStrategyType(gridSize);
+        return `${versionName}-${strategyType}`;
+    }
+
+    // 获取策略类型
+    getStrategyType(gridSize) {
+        if (gridSize <= 1) return '日内交易';
+        if (gridSize <= 3) return '短线交易';
+        if (gridSize <= 6) return '日常交易';
+        if (gridSize <= 10) return '波段交易';
+        if (gridSize <= 20) return '长线交易';
+        return '极端交易';
     }
 
     // 更新压力测试
@@ -395,8 +436,8 @@ class GridTradingApp {
     // 更新网格显示
     updateGridDisplay() {
         const container = document.getElementById('grid-display');
-        
-        if (!this.currentGrid) {
+
+        if (this.grids.length === 0) {
             container.innerHTML = `
                 <div class="text-center text-muted py-5">
                     <i class="bi bi-grid-3x3 display-1"></i>
@@ -406,12 +447,22 @@ class GridTradingApp {
             return;
         }
 
+        // 如果有多个网格，显示网格选择器
+        if (this.grids.length > 1) {
+            this.displayGridSelector(container);
+        }
+
+        if (!this.currentGrid) {
+            this.currentGrid = this.grids[0];
+        }
+
         const grid = this.currentGrid;
         let html = `
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <div>
-                    <h6>${grid.symbolName} (${grid.symbol}) - ${grid.version}版</h6>
+                    <h6>${grid.symbolName} (${grid.symbol}) - ${grid.strategyName || grid.version + '版'}</h6>
                     ${grid.version === '2.1' ? `<small class="text-info">留利润策略: ${this.getRetentionTypeName(grid.retentionType)}</small>` : ''}
+                    ${grid.strategyType ? `<small class="text-warning ms-2">策略类型: ${grid.strategyType}</small>` : ''}
                 </div>
                 <small class="text-muted">创建时间: ${new Date(grid.createdAt).toLocaleDateString()}</small>
             </div>
@@ -975,6 +1026,117 @@ function restoreData() {
 function clearData() {
     app.clearData();
 }
+
+// 显示网格选择器
+GridTradingApp.prototype.displayGridSelector = function(container) {
+    // 按品种分组
+    const groupedGrids = {};
+    this.grids.forEach(grid => {
+        const symbolName = this.getSymbolName(grid.symbol);
+        if (!groupedGrids[symbolName]) {
+            groupedGrids[symbolName] = [];
+        }
+        groupedGrids[symbolName].push(grid);
+    });
+
+    let selectorHTML = `
+        <div class="card mb-3">
+            <div class="card-header bg-info text-white">
+                <h6 class="mb-0">
+                    <i class="bi bi-layers"></i> 多策略管理
+                    <small>(共${this.grids.length}个策略)</small>
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+    `;
+
+    Object.entries(groupedGrids).forEach(([symbolName, grids]) => {
+        selectorHTML += `
+            <div class="col-md-6 mb-3">
+                <h6 class="text-primary">${symbolName}</h6>
+                <div class="btn-group-vertical w-100" role="group">
+        `;
+
+        grids.forEach(grid => {
+            const isActive = this.currentGrid && this.currentGrid.id === grid.id;
+            const activeClass = isActive ? 'btn-primary' : 'btn-outline-primary';
+            const statusInfo = this.getGridStatusInfo(grid);
+
+            selectorHTML += `
+                <button type="button" class="btn ${activeClass} btn-sm text-start"
+                        onclick="app.switchToGrid(${grid.id})"
+                        ${isActive ? 'disabled' : ''}>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>${grid.strategyName || grid.version + '版'}</strong>
+                            <br><small>${(grid.gridSize * 100).toFixed(1)}% | ${grid.grids.length}格</small>
+                        </div>
+                        <div class="text-end">
+                            <small class="text-muted">${statusInfo.status}</small>
+                            <br><small class="text-success">${statusInfo.profit}</small>
+                        </div>
+                    </div>
+                </button>
+            `;
+        });
+
+        selectorHTML += `
+                </div>
+            </div>
+        `;
+    });
+
+    selectorHTML += `
+                </div>
+                <div class="text-center mt-2">
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle"></i>
+                        点击切换策略 | 同一品种可运行多个策略
+                    </small>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // 移除旧的选择器并添加新的
+    const existingSelector = container.querySelector('.card .bg-info');
+    if (existingSelector) {
+        existingSelector.closest('.card').remove();
+    }
+    container.insertAdjacentHTML('afterbegin', selectorHTML);
+};
+
+// 获取网格状态信息
+GridTradingApp.prototype.getGridStatusInfo = function(grid) {
+    const activeGrids = grid.grids.filter(g => g.status === 'bought').length;
+    const completedGrids = grid.grids.filter(g => g.status === 'sold').length;
+    const totalProfit = grid.grids.reduce((sum, g) => sum + (g.profit || 0), 0);
+
+    let status = '';
+    if (activeGrids > 0) {
+        status = `${activeGrids}格持仓`;
+    } else if (completedGrids > 0) {
+        status = `${completedGrids}格完成`;
+    } else {
+        status = '等待买入';
+    }
+
+    const profit = totalProfit > 0 ? `+¥${totalProfit.toFixed(2)}` :
+                  totalProfit < 0 ? `-¥${Math.abs(totalProfit).toFixed(2)}` : '¥0.00';
+
+    return { status, profit };
+};
+
+// 切换到指定网格
+GridTradingApp.prototype.switchToGrid = function(gridId) {
+    const grid = this.grids.find(g => g.id === gridId);
+    if (grid) {
+        this.currentGrid = grid;
+        this.saveData();
+        this.updateDisplay();
+    }
+};
 
 // 处理品种选择变化
 function handleSymbolChange() {
