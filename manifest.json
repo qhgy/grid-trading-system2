@@ -1,0 +1,63 @@
+{
+    "name": "网格交易管理系统",
+    "short_name": "网格交易",
+    "description": "基于ETF拯救世界7年实战经验的网格交易管理系统",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#007bff",
+    "orientation": "portrait-primary",
+    "scope": "/",
+    "lang": "zh-CN",
+    "categories": ["finance", "productivity", "utilities"],
+    "icons": [
+        {
+            "src": "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/icons/grid-3x3-gap.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any maskable"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "https://via.placeholder.com/540x720/007bff/ffffff?text=Grid+Trading+System",
+            "sizes": "540x720",
+            "type": "image/png",
+            "form_factor": "narrow"
+        },
+        {
+            "src": "https://via.placeholder.com/1024x768/007bff/ffffff?text=Grid+Trading+Desktop",
+            "sizes": "1024x768",
+            "type": "image/png",
+            "form_factor": "wide"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "网格计算器",
+            "short_name": "计算器",
+            "description": "快速计算网格参数",
+            "url": "/calculator.html",
+            "icons": [
+                {
+                    "src": "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/icons/calculator.svg",
+                    "sizes": "any",
+                    "type": "image/svg+xml"
+                }
+            ]
+        },
+        {
+            "name": "交易系统",
+            "short_name": "交易",
+            "description": "完整的网格交易管理",
+            "url": "/trading.html",
+            "icons": [
+                {
+                    "src": "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/icons/grid-3x3.svg",
+                    "sizes": "any",
+                    "type": "image/svg+xml"
+                }
+            ]
+        }
+    ]
+}

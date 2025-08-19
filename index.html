@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网格交易管理系统 2.0</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#007bff">
+    <meta name="description" content="基于ETF拯救世界7年实战经验的网格交易管理系统，支持2.1留利润版、2.2逐格加码版、2.3一网打尽版">
+    <style>
+        body { background-color: #f8f9fa; }
+        .card { 
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            transition: transform 0.2s ease-in-out;
+        }
+        .card:hover { transform: translateY(-5px); }
+        .navbar-brand { font-weight: bold; }
+        .feature-icon { font-size: 3rem; margin-bottom: 1rem; }
+        .hero-section { 
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            padding: 4rem 0;
+        }
+        .version-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #28a745;
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        .strategy-card {
+            position: relative;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-grid-3x3-gap"></i> 网格交易系统 2.0
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="calculator.html">
+                            <i class="bi bi-calculator"></i> 计算器
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="trading.html">
+                            <i class="bi bi-grid-3x3"></i> 交易系统
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://github.com/yourusername/grid-trading-system" target="_blank">
+                            <i class="bi bi-github"></i> GitHub
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 英雄区域 -->
+    <section class="hero-section">
+        <div class="container text-center">
+            <h1 class="display-4 fw-bold mb-4">网格交易管理系统 2.0</h1>
+            <p class="lead mb-4">基于ETF拯救世界7年实战经验，支持2.1留利润版、2.2逐格加码版、2.3一网打尽版</p>
+            <div class="row justify-content-center">
+                <div class="col-auto">
+                    <a href="calculator.html" class="btn btn-light btn-lg me-3">
+                        <i class="bi bi-calculator"></i> 立即计算
+                    </a>
+                    <a href="trading.html" class="btn btn-outline-light btn-lg">
+                        <i class="bi bi-grid-3x3"></i> 开始交易
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 功能特色 -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row text-center mb-5">
+                <div class="col-12">
+                    <h2 class="fw-bold">2.0版本核心功能</h2>
+                    <p class="text-muted">基于ETF拯救世界网格交易策略的完整实现</p>
+                </div>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card strategy-card border-primary">
+                        <div class="version-badge">2.1</div>
+                        <div class="card-body text-center">
+                            <i class="bi bi-piggy-bank feature-icon text-primary"></i>
+                            <h5 class="card-title">留利润版</h5>
+                            <p class="card-text">让利润奔跑，享受长期上涨收益。支持基础留利润、留双份利润、留三份利润三种策略。</p>
+                            <ul class="list-unstyled text-start">
+                                <li><i class="bi bi-check-circle text-success"></i> 自动计算留存份额</li>
+                                <li><i class="bi bi-check-circle text-success"></i> 累计留存实时显示</li>
+                                <li><i class="bi bi-check-circle text-success"></i> 三种留存策略可选</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card strategy-card border-warning">
+                        <div class="version-badge bg-warning">2.2</div>
+                        <div class="card-body text-center">
+                            <i class="bi bi-graph-up-arrow feature-icon text-warning"></i>
+                            <h5 class="card-title">逐格加码版</h5>
+                            <p class="card-text">价格越低投入越多，提高底部收益。智能计算各格投入金额，优化资金配置。</p>
+                            <ul class="list-unstyled text-start">
+                                <li><i class="bi bi-check-circle text-success"></i> 智能加码计算</li>
+                                <li><i class="bi bi-check-circle text-success"></i> 可设置加码比例</li>
+                                <li><i class="bi bi-check-circle text-success"></i> 提高底部收益率</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card strategy-card border-danger">
+                        <div class="version-badge bg-danger">2.3</div>
+                        <div class="card-body text-center">
+                            <i class="bi bi-bullseye feature-icon text-danger"></i>
+                            <h5 class="card-title">一网打尽版</h5>
+                            <p class="card-text">大中小网格组合，捕获不同级别利润。小网日常收益，中网改善生活，大网赚大钱。</p>
+                            <ul class="list-unstyled text-start">
+                                <li><i class="bi bi-check-circle text-success"></i> 三网格独立管理</li>
+                                <li><i class="bi bi-check-circle text-success"></i> 资金分配优化</li>
+                                <li><i class="bi bi-check-circle text-success"></i> 收益潜力最大化</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 快速开始 -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6">
+                    <h3 class="fw-bold mb-4">🚀 快速开始</h3>
+                    <div class="d-flex mb-3">
+                        <div class="flex-shrink-0">
+                            <span class="badge bg-primary rounded-pill">1</span>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6>选择策略版本</h6>
+                            <p class="text-muted mb-0">推荐新手从2.1留利润版开始</p>
+                        </div>
+                    </div>
+                    <div class="d-flex mb-3">
+                        <div class="flex-shrink-0">
+                            <span class="badge bg-primary rounded-pill">2</span>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6>设置交易参数</h6>
+                            <p class="text-muted mb-0">填写品种、价格、网格间距等参数</p>
+                        </div>
+                    </div>
+                    <div class="d-flex mb-3">
+                        <div class="flex-shrink-0">
+                            <span class="badge bg-primary rounded-pill">3</span>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6>压力测试</h6>
+                            <p class="text-muted mb-0">确保资金充足，风险可控</p>
+                        </div>
+                    </div>
+                    <div class="d-flex">
+                        <div class="flex-shrink-0">
+                            <span class="badge bg-primary rounded-pill">4</span>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6>开始交易</h6>
+                            <p class="text-muted mb-0">按计划执行买卖操作</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <h3 class="fw-bold mb-4">💡 核心优势</h3>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-shield-check text-success me-2"></i>
+                                <span>数据安全</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-phone text-primary me-2"></i>
+                                <span>移动适配</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-lightning text-warning me-2"></i>
+                                <span>实时计算</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-download text-info me-2"></i>
+                                <span>数据导出</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-bell text-danger me-2"></i>
+                                <span>智能提醒</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-graph-up text-success me-2"></i>
+                                <span>收益统计</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 风险提示 -->
+    <section class="py-4 bg-warning bg-opacity-10">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-warning mb-0">
+                        <h6><i class="bi bi-exclamation-triangle"></i> 重要风险提示</h6>
+                        <p class="mb-0">
+                            本系统基于ETF拯救世界公众号的网格交易策略理论，仅供学习参考，不构成投资建议。
+                            投资有风险，入市需谨慎。请在充分理解策略原理和风险后谨慎使用，建议先小资金测试。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-light py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>网格交易系统 2.0</h6>
+                    <p class="text-muted mb-0">基于ETF拯救世界7年实战经验</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="https://github.com/yourusername/grid-trading-system" class="text-light me-3" target="_blank">
+                        <i class="bi bi-github"></i> GitHub
+                    </a>
+                    <a href="calculator.html" class="text-light me-3">
+                        <i class="bi bi-calculator"></i> 计算器
+                    </a>
+                    <a href="trading.html" class="text-light">
+                        <i class="bi bi-grid-3x3"></i> 交易系统
+                    </a>
+                </div>
+            </div>
+            <hr class="my-3">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <p class="text-muted mb-0">
+                        © 2024 网格交易系统 | MIT License | 
+                        感谢 <a href="#" class="text-light">ETF拯救世界</a> 提供策略理论基础
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- PWA注册 -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(function(registration) {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch(function(registrationError) {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>
