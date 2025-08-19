@@ -363,6 +363,33 @@ class GridTradingApp {
         this.updateGridDisplay();
         this.updateTradesDisplay();
         this.updateStatsDisplay();
+        this.updateSystemInfo();
+    }
+
+    // 更新系统信息
+    updateSystemInfo() {
+        // 更新云端备份状态
+        const cloudStatus = document.getElementById('cloud-status');
+        if (cloudStatus) {
+            cloudStatus.textContent = this.checkCloudBackupStatus();
+            cloudStatus.className = 'fw-bold ' + (localStorage.getItem('githubToken') ? 'text-success' : 'text-warning');
+        }
+
+        // 更新系统统计
+        const gridCountElement = document.getElementById('grid-count');
+        const tradeRecordsElement = document.getElementById('trade-records');
+        const dataSizeElement = document.getElementById('data-size');
+
+        if (gridCountElement) {
+            gridCountElement.textContent = this.grids.length;
+        }
+        if (tradeRecordsElement) {
+            tradeRecordsElement.textContent = this.trades.length;
+        }
+        if (dataSizeElement) {
+            const dataSize = JSON.stringify({grids: this.grids, trades: this.trades}).length;
+            dataSizeElement.textContent = (dataSize / 1024).toFixed(1) + ' KB';
+        }
     }
 
     // 更新网格显示
@@ -648,13 +675,207 @@ class GridTradingApp {
         URL.revokeObjectURL(url);
     }
 
-    // 备份数据
+    // 备份数据到云端
+    async backupToCloud() {
+        const token = localStorage.getItem('githubToken');
+        if (!token) {
+            this.showCloudSetup();
+            return;
+        }
+
+        try {
+            const data = {
+                grids: this.grids,
+                trades: this.trades,
+                settings: this.getSettings(),
+                backupDate: new Date().toISOString(),
+                version: '2.0'
+            };
+
+            const gistData = {
+                description: `网格交易系统数据备份 - ${new Date().toLocaleDateString()}`,
+                public: false,
+                files: {
+                    'grid-trading-backup.json': {
+                        content: JSON.stringify(data, null, 2)
+                    }
+                }
+            };
+
+            const response = await fetch('https://api.github.com/gists', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(gistData)
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                localStorage.setItem('cloudBackupId', result.id);
+                localStorage.setItem('lastCloudBackup', new Date().toISOString());
+                alert('数据已成功备份到云端！\n备份ID: ' + result.id.substring(0, 8) + '...');
+            } else {
+                throw new Error('备份失败: ' + response.statusText);
+            }
+        } catch (error) {
+            console.error('云端备份失败:', error);
+            alert('云端备份失败: ' + error.message);
+        }
+    }
+
+    // 从云端恢复数据
+    async restoreFromCloud() {
+        const token = localStorage.getItem('githubToken');
+        if (!token) {
+            this.showCloudSetup();
+            return;
+        }
+
+        const backupId = localStorage.getItem('cloudBackupId');
+        if (!backupId) {
+            alert('未找到云端备份记录，请先进行云端备份');
+            return;
+        }
+
+        try {
+            const response = await fetch(`https://api.github.com/gists/${backupId}`, {
+                headers: {
+                    'Authorization': `token ${token}`
+                }
+            });
+
+            if (response.ok) {
+                const gist = await response.json();
+                const backupContent = gist.files['grid-trading-backup.json'].content;
+                const data = JSON.parse(backupContent);
+
+                if (confirm(`确定要恢复云端数据吗？\n备份时间: ${new Date(data.backupDate).toLocaleString()}\n当前本地数据将被覆盖！`)) {
+                    this.grids = data.grids || [];
+                    this.trades = data.trades || [];
+                    this.currentGrid = this.grids[0] || null;
+
+                    // 恢复设置
+                    if (data.settings) {
+                        this.restoreSettings(data.settings);
+                    }
+
+                    this.saveData();
+                    this.updateDisplay();
+                    alert('云端数据恢复成功！');
+                }
+            } else {
+                throw new Error('获取云端数据失败: ' + response.statusText);
+            }
+        } catch (error) {
+            console.error('云端恢复失败:', error);
+            alert('云端恢复失败: ' + error.message);
+        }
+    }
+
+    // 显示云端设置界面
+    showCloudSetup() {
+        const modal = document.createElement('div');
+        modal.className = 'modal fade show';
+        modal.style.display = 'block';
+        modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+        modal.innerHTML = `
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="bi bi-cloud-upload"></i> 云端存储设置
+                        </h5>
+                        <button type="button" class="btn-close" onclick="this.closest('.modal').remove()"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-info">
+                            <h6><i class="bi bi-info-circle"></i> 使用GitHub Gist存储数据</h6>
+                            <p class="mb-0">我们使用GitHub Gist来安全存储您的数据，完全免费且隐私保护。</p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">GitHub Personal Access Token</label>
+                            <input type="password" class="form-control" id="githubToken"
+                                   placeholder="请输入您的GitHub Token">
+                            <div class="form-text">
+                                <a href="https://github.com/settings/tokens/new?scopes=gist&description=Grid%20Trading%20System"
+                                   target="_blank" class="text-decoration-none">
+                                    <i class="bi bi-box-arrow-up-right"></i> 点击这里生成Token
+                                </a>
+                                （只需要gist权限）
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <h6>设置步骤：</h6>
+                            <ol class="small">
+                                <li>点击上方链接访问GitHub</li>
+                                <li>输入Token名称：Grid Trading System</li>
+                                <li>确保勾选"gist"权限</li>
+                                <li>点击"Generate token"</li>
+                                <li>复制生成的Token并粘贴到上方输入框</li>
+                            </ol>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="this.closest('.modal').remove()">
+                            取消
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="app.saveCloudSettings()">
+                            保存设置
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    // 保存云端设置
+    saveCloudSettings() {
+        const token = document.getElementById('githubToken').value.trim();
+        if (!token) {
+            alert('请输入GitHub Token');
+            return;
+        }
+
+        localStorage.setItem('githubToken', token);
+        document.querySelector('.modal').remove();
+        alert('云端设置保存成功！现在可以使用云端备份功能了。');
+    }
+
+    // 获取用户设置
+    getSettings() {
+        return {
+            notifications: document.getElementById('enableNotifications')?.checked || false,
+            lastGridVersion: this.currentGrid?.version || '2.1',
+            preferences: {
+                defaultGridSize: 5,
+                defaultGridAmount: 10000,
+                defaultGridCount: 10
+            }
+        };
+    }
+
+    // 恢复用户设置
+    restoreSettings(settings) {
+        if (settings.notifications !== undefined) {
+            const notificationCheckbox = document.getElementById('enableNotifications');
+            if (notificationCheckbox) {
+                notificationCheckbox.checked = settings.notifications;
+            }
+        }
+    }
+
+    // 本地文件备份（保留原功能）
     backupData() {
         this.exportData();
         alert('数据备份成功！');
     }
 
-    // 恢复数据
+    // 本地文件恢复（保留原功能）
     restoreData() {
         const input = document.createElement('input');
         input.type = 'file';
@@ -680,6 +901,32 @@ class GridTradingApp {
             }
         };
         input.click();
+    }
+
+    // 检查云端备份状态
+    checkCloudBackupStatus() {
+        const lastBackup = localStorage.getItem('lastCloudBackup');
+        const token = localStorage.getItem('githubToken');
+
+        if (!token) {
+            return '未设置云端存储';
+        }
+
+        if (!lastBackup) {
+            return '未进行云端备份';
+        }
+
+        const backupDate = new Date(lastBackup);
+        const now = new Date();
+        const daysDiff = Math.floor((now - backupDate) / (1000 * 60 * 60 * 24));
+
+        if (daysDiff === 0) {
+            return '今天已备份';
+        } else if (daysDiff === 1) {
+            return '昨天备份';
+        } else {
+            return `${daysDiff}天前备份`;
+        }
     }
 
     // 清空数据
