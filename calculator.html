@@ -114,13 +114,36 @@
                     <div class="card-body">
                         <div class="mb-3">
                             <label class="form-label">品种名称</label>
-                            <select class="form-select" id="symbol">
-                                <option value="中证500ETF">中证500ETF</option>
-                                <option value="沪深300ETF">沪深300ETF</option>
-                                <option value="创业板ETF">创业板ETF</option>
-                                <option value="科技ETF">科技ETF</option>
-                                <option value="券商ETF">券商ETF</option>
-                            </select>
+                            <div class="input-group">
+                                <select class="form-select" id="symbol" onchange="handleSymbolChange()">
+                                    <option value="">-- 选择预设品种 --</option>
+                                    <optgroup label="指数ETF（推荐）">
+                                        <option value="中证500ETF">中证500ETF (510500)</option>
+                                        <option value="沪深300ETF">沪深300ETF (510300)</option>
+                                        <option value="创业板ETF">创业板ETF (159915)</option>
+                                        <option value="科创50ETF">科创50ETF (588000)</option>
+                                    </optgroup>
+                                    <optgroup label="行业ETF">
+                                        <option value="科技ETF">科技ETF (515000)</option>
+                                        <option value="券商ETF">券商ETF (512880)</option>
+                                        <option value="银行ETF">银行ETF (512800)</option>
+                                        <option value="医药ETF">医药ETF (512120)</option>
+                                        <option value="消费ETF">消费ETF (159928)</option>
+                                    </optgroup>
+                                    <optgroup label="商品ETF">
+                                        <option value="黄金ETF">黄金ETF (518880)</option>
+                                        <option value="白银ETF">白银ETF (518290)</option>
+                                        <option value="原油ETF">原油ETF (159930)</option>
+                                    </optgroup>
+                                    <option value="custom">🔧 自定义品种</option>
+                                </select>
+                                <button class="btn btn-outline-secondary" type="button" onclick="showCustomInput()">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+                            </div>
+                            <input type="text" class="form-control mt-2" id="customSymbol"
+                                   placeholder="请输入自定义品种名称（如：比特币、茅台等）"
+                                   style="display: none;">
                         </div>
                         
                         <div class="mb-3">
@@ -283,14 +306,42 @@
             });
         });
 
-        function calculate() {
+        // 处理品种选择变化
+        function handleSymbolChange() {
             const symbol = document.getElementById('symbol').value;
+            const customInput = document.getElementById('customSymbol');
+
+            if (symbol === 'custom') {
+                customInput.style.display = 'block';
+                customInput.focus();
+            } else {
+                customInput.style.display = 'none';
+                customInput.value = '';
+            }
+            calculate();
+        }
+
+        // 显示自定义输入框
+        function showCustomInput() {
+            document.getElementById('symbol').value = 'custom';
+            handleSymbolChange();
+        }
+
+        function calculate() {
+            let symbol = document.getElementById('symbol').value;
+            const customSymbol = document.getElementById('customSymbol').value;
+
+            // 如果选择了自定义或输入了自定义品种名称
+            if (symbol === 'custom' || customSymbol) {
+                symbol = customSymbol || '自定义品种';
+            }
+
             const startPrice = parseFloat(document.getElementById('startPrice').value);
             const gridSize = parseFloat(document.getElementById('gridSize').value);
             const gridAmount = parseFloat(document.getElementById('gridAmount').value);
             const gridCount = parseInt(document.getElementById('gridCount').value);
-            
-            if (!startPrice || !gridSize || !gridAmount || !gridCount) {
+
+            if (!symbol || !startPrice || !gridSize || !gridAmount || !gridCount) {
                 return;
             }
             

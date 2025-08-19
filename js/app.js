@@ -75,9 +75,19 @@ class GridTradingApp {
     // 创建网格
     createGrid() {
         const gridVersion = document.getElementById('gridVersion').value;
-        const symbol = document.getElementById('symbol').value;
+        let symbol = document.getElementById('symbol').value;
+        const customSymbol = document.getElementById('customSymbol').value;
         const startPrice = parseFloat(document.getElementById('startPrice').value);
         const gridSize = parseFloat(document.getElementById('gridSize').value);
+
+        // 处理自定义品种
+        if (symbol === 'custom' || customSymbol) {
+            if (!customSymbol) {
+                alert('请输入自定义品种名称');
+                return;
+            }
+            symbol = customSymbol;
+        }
 
         if (!symbol || !startPrice || !gridSize) {
             alert('请填写完整的基础参数');
@@ -207,10 +217,24 @@ class GridTradingApp {
     // 获取品种名称
     getSymbolName(symbol) {
         const names = {
+            // 指数ETF
             '510500': '中证500ETF',
             '510300': '沪深300ETF',
             '159915': '创业板ETF',
-            '512880': '证券ETF'
+            '588000': '科创50ETF',
+            // 行业ETF
+            '515000': '科技ETF',
+            '512880': '券商ETF',
+            '512800': '银行ETF',
+            '512120': '医药ETF',
+            '159928': '消费ETF',
+            // 商品ETF
+            '518880': '黄金ETF',
+            '518290': '白银ETF',
+            '159930': '原油ETF',
+            // 海外ETF
+            '513100': '纳指ETF',
+            '513500': '标普500ETF'
         };
         return names[symbol] || symbol;
     }
@@ -703,6 +727,28 @@ function restoreData() {
 // 清空数据
 function clearData() {
     app.clearData();
+}
+
+// 处理品种选择变化
+function handleSymbolChange() {
+    const symbol = document.getElementById('symbol').value;
+    const customInput = document.getElementById('customSymbol');
+
+    if (symbol === 'custom') {
+        customInput.style.display = 'block';
+        customInput.focus();
+        customInput.setAttribute('required', 'required');
+    } else {
+        customInput.style.display = 'none';
+        customInput.value = '';
+        customInput.removeAttribute('required');
+    }
+}
+
+// 显示自定义输入框
+function showCustomInput() {
+    document.getElementById('symbol').value = 'custom';
+    handleSymbolChange();
 }
 
 // 初始化应用
