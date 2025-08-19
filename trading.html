@@ -181,7 +181,12 @@
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">网格间距 (%)</label>
-                                    <input type="number" class="form-control" id="gridSize" value="5" min="1" max="20" required>
+                                    <input type="number" class="form-control" id="gridSize" value="5" min="0.1" max="50" step="0.1" required>
+                                    <div class="form-text">
+                                        <small class="text-muted">
+                                            💡 0.1%-1%: 超短线 | 2%-5%: 稳健型 | 5%-10%: 成长型 | 10%+: 高风险
+                                        </small>
+                                    </div>
                                 </div>
                                 
                                 <!-- 基础参数 -->
